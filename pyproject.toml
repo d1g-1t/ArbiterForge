@@ -1,0 +1,69 @@
+[project]
+name = "arbiterforge"
+version = "0.2.0"
+description = "Event-sourced case management for commercial arbitration in Russia (ICAC, MAC, ad hoc) with statutory deadline engine"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "fastapi>=0.143",
+  "uvicorn[standard]>=0.54",
+  "sqlalchemy[asyncio]>=2.1.4",
+  "asyncpg>=0.32",
+  "alembic>=1.20",
+  "redis>=6.4",
+  "celery[redis]>=5.6.3",
+  "httpx>=0.28",
+  "pydantic>=2.14",
+  "pydantic-settings>=2.11",
+  "structlog>=26.1",
+  "pyseto>=1.10",
+  "bcrypt>=5.0",
+  "prometheus-client>=0.26",
+  "jinja2>=3.1.6",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.1",
+  "pytest-asyncio>=1.4",
+  "pytest-cov>=7.0",
+  "hypothesis>=6.170",
+  "ruff>=0.17",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/arbiterforge"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "RET", "SIM", "RUF", "ASYNC", "S", "PT"]
+ignore = ["S101", "S104", "S105", "S106", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S311", "S603"]
+"src/arbiterforge/domain/legal_basis.py" = ["E501"]
+"src/arbiterforge/infrastructure/exporters/timeline.py" = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = ["integration: requires PostgreSQL and Redis (ARBITERFORGE_TEST_DATABASE_URL / ARBITERFORGE_TEST_REDIS_URL)"]
+
+[tool.coverage.run]
+source = ["arbiterforge"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
